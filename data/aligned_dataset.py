@@ -40,7 +40,7 @@ class AlignedDataset(BaseDataset):
         A_path = self.AB_paths[index]
         A = Image.open(A_path).convert('RGB')
         
-        B_path = A_path.replace("A","B")
+        B_path = A_path.replace(opt.direction.split("to")[0],opt.direction.split("to")[1])
         B = Image.open(B_path).convert('RGB')
         
         # split AB image into A and B
