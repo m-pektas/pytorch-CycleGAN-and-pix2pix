@@ -2,7 +2,7 @@ import os
 from data.base_dataset import BaseDataset, get_params, get_transform, get_transform_base
 from data.image_folder import make_dataset
 from PIL import Image
-
+import pandas as pd
 
 class AlignedDataset(BaseDataset):
     """A dataset class for paired image dataset.
@@ -23,6 +23,11 @@ class AlignedDataset(BaseDataset):
         assert(self.opt.load_size >= self.opt.crop_size)   # crop_size should be smaller than the size of loaded image
         self.input_nc = self.opt.output_nc if self.opt.direction == 'BtoA' else self.opt.input_nc
         self.output_nc = self.opt.input_nc if self.opt.direction == 'BtoA' else self.opt.output_nc
+        
+        
+        
+        csv_path = os.path.join(self.opt.dataroot,"BoxInfos+Targets.csv")
+        self.csv = pd.read_csv(csv_path)
 
     def __getitem__(self, index):
         """Return a data point and its metadata information.
@@ -40,8 +45,13 @@ class AlignedDataset(BaseDataset):
         A_path = self.AB_paths[index]
         A = Image.open(A_path).convert('RGB')
         
-        B_path = A_path.replace(opt.direction.split("to")[0],opt.direction.split("to")[1])
+        B_path = A_path.replace(self.opt.direction.split("to")[0],self.opt.direction.split("to")[1])
         B = Image.open(B_path).convert('RGB')
+        
+        
+        target_name = self.csv[self.csv["ImageNames"]=="ffhq_12779.png"]["Targets"].values[0]
+        target_path =  os.path.join(self.opt.dataroot,"pool",target_name)
+        target = Image.open(target_path).convert('RGB')
         
         # split AB image into A and B
         # w, h = AB.size
@@ -58,8 +68,9 @@ class AlignedDataset(BaseDataset):
 
         A = transform(A)
         B = transform(B)
+        target = transform(target)
 
-        return {'A': A, 'B': B, 'A_paths': A_path, 'B_paths': B_path}
+        return {'A': A, 'B': B, 'A_paths': A_path, 'B_paths': B_path, "target":target}
 
     def __len__(self):
         """Return the total number of images in the dataset."""

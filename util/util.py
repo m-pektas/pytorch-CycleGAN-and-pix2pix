@@ -7,7 +7,7 @@ from PIL import Image
 import os
 import math
 
-def tensor2im(input_image, imtype=np.uint8):
+def tensor2im(input_image, imtype=np.uint8, max_limit=50):
     """"Converts a Tensor array into a numpy image array.
 
     Parameters:
@@ -23,9 +23,15 @@ def tensor2im(input_image, imtype=np.uint8):
             image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
             
         elif isinstance(input_image, torch.Tensor) and len(input_image.shape)==4:
-            
-                nrows = int(math.sqrt(input_image.size(0)))
-                image_tensor = torchvision.utils.make_grid(input_image, nrows)
+                # if input_image.size(0) > int(math.sqrt(max_limit)):
+                #     # nrows = int(math.sqrt(max_limit))
+                #     # nrows = max_limit
+                # else:
+                    # nrows = int(math.sqrt(input_image.size(0)))
+                    # nrows = input_image.size(0)
+                nrows = 1       
+                
+                image_tensor = torchvision.utils.make_grid(input_image[:max_limit], nrows)
                 image_numpy = image_tensor.detach().cpu().float().numpy()  # convert it into a numpy array
                 image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0 
         else:
