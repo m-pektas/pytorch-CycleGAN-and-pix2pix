@@ -3,6 +3,7 @@ from data.base_dataset import BaseDataset, get_params, get_transform, get_transf
 from data.image_folder import make_dataset
 from PIL import Image
 import pandas as pd
+import numpy as np
 
 class AlignedDataset(BaseDataset):
     """A dataset class for paired image dataset.
@@ -49,10 +50,16 @@ class AlignedDataset(BaseDataset):
         B = Image.open(B_path).convert('RGB')
         
         
-        target_name = self.csv[self.csv["ImageNames"]=="ffhq_12779.png"]["Targets"].values[0]
-        target_path =  os.path.join(self.opt.dataroot,"pool",target_name)
-        target = Image.open(target_path).convert('RGB')
-        
+        try :
+            A_name = A_path.split(" ")[-1]
+            target_name = self.csv[self.csv["ImageNames"]==A_name]["Targets"].values[0]
+            target_path =  os.path.join(self.opt.dataroot,"pool",target_name)
+            target = Image.open(target_path).convert('RGB')
+        except:
+            print("Target image not found !!!")
+            target_np = np.random.randn(*(list(A.size)+[3]))
+            target = Image.fromarray(target_np.astype("uint8")).convert('RGB')
+            
         # split AB image into A and B
         # w, h = AB.size
         # w2 = int(w / 2)
