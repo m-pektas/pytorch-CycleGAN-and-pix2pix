@@ -51,7 +51,7 @@ class AlignedDataset(BaseDataset):
         
         
         try :
-            A_name = A_path.split(" ")[-1]
+            A_name = A_path.split("/")[-1]
             target_name = self.csv[self.csv["ImageNames"]==A_name]["Targets"].values[0]
             target_path =  os.path.join(self.opt.dataroot,"pool",target_name)
             target = Image.open(target_path).convert('RGB')

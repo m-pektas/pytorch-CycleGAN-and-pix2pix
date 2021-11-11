@@ -87,5 +87,5 @@ if __name__ == '__main__':
         print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.n_epochs + opt.n_epochs_decay, time.time() - epoch_start_time))
 
         if epoch % opt.test_epoch_freq == 0:
-            run(f"python test.py --dataroot ./datasets/syn --name pix2pix --model pix2pix --direction AtoB --epoch {opt.save_epoch_freq*(epoch//opt.save_epoch_freq)}")
+            run(f"python test.py --dataroot ./datasets/syn --name {opt.name} --model pix2pix --direction AtoB --epoch {opt.save_epoch_freq*(epoch//opt.save_epoch_freq)}")
         
